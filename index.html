@@ -20,12 +20,15 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding-bottom: 80px;
+            padding-bottom: 100px;
+            -webkit-tap-highlight-color: rgba(0,0,0,0);
+            -webkit-touch-callout: none;
+            user-select: none;
         }
 
         .header {
             background: rgba(255, 255, 255, 0.95);
-            padding: 20px;
+            padding: 22px 20px;
             text-align: center;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             position: sticky;
@@ -35,14 +38,14 @@
 
         .header h1 {
             color: #2c3e50;
-            font-size: 24px;
+            font-size: 26px;
             font-weight: 700;
             margin-bottom: 5px;
         }
 
         .header p {
             color: #7f8c8d;
-            font-size: 14px;
+            font-size: 15px;
         }
 
         .notification-badge {
@@ -70,6 +73,42 @@
             animation: pulse 2s infinite;
         }
 
+        .alert-banner {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 12px 20px;
+            text-align: center;
+            font-weight: 600;
+            z-index: 99;
+            display: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .alert-banner.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        .alert-banner-close {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.3);
+            border: none;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            line-height: 1;
+        }
+
         @keyframes pulse {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.1); }
@@ -93,23 +132,32 @@
 
         .tab {
             flex: 1;
-            padding: 12px 8px;
+            padding: 14px 10px;
             border: none;
             background: transparent;
             border-radius: 10px;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 600;
             color: #7f8c8d;
             cursor: pointer;
             transition: all 0.3s ease;
             white-space: nowrap;
             min-width: fit-content;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: manipulation;
         }
 
         .tab.active {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+        }
+
+        .tab:active {
+            transform: scale(0.96);
         }
 
         .admin-only {
@@ -143,41 +191,112 @@
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
         label {
             display: block;
             color: #2c3e50;
             font-weight: 600;
-            margin-bottom: 8px;
-            font-size: 14px;
+            margin-bottom: 10px;
+            font-size: 15px;
         }
 
         input, select, textarea {
             width: 100%;
-            padding: 12px 15px;
+            padding: 16px 18px;
             border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 16px;
+            border-radius: 12px;
+            font-size: 17px;
             transition: all 0.3s ease;
             font-family: inherit;
+            -webkit-appearance: none;
+            appearance: none;
         }
 
         input:focus, select:focus, textarea:focus {
             outline: none;
             border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .attrezzatura-grid {
+            display: grid;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .attrezzatura-card {
+            background: white;
+            border: 3px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            min-height: 90px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .attrezzatura-card:active {
+            transform: scale(0.98);
+        }
+
+        .attrezzatura-card.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .attrezzatura-card.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 28px;
+            height: 28px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .attrezzatura-nome {
+            font-weight: 700;
+            font-size: 17px;
+            color: #2c3e50;
+            margin-bottom: 6px;
+            padding-right: 35px;
+        }
+
+        .attrezzatura-info {
+            font-size: 14px;
+            color: #7f8c8d;
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .attrezzatura-info span {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
         }
 
         .camera-button {
             width: 100%;
-            padding: 15px;
+            padding: 18px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            border-radius: 10px;
-            font-size: 16px;
+            border-radius: 12px;
+            font-size: 17px;
             font-weight: 600;
             cursor: pointer;
             display: flex;
@@ -185,6 +304,8 @@
             justify-content: center;
             gap: 10px;
             margin-bottom: 15px;
+            min-height: 56px;
+            touch-action: manipulation;
         }
 
         .camera-button:active {
@@ -194,7 +315,7 @@
         .photo-preview {
             width: 100%;
             max-height: 300px;
-            border-radius: 10px;
+            border-radius: 12px;
             margin-top: 10px;
             display: none;
             object-fit: cover;
@@ -206,15 +327,17 @@
 
         .btn-primary {
             width: 100%;
-            padding: 15px;
+            padding: 18px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            border-radius: 10px;
-            font-size: 16px;
+            border-radius: 12px;
+            font-size: 17px;
             font-weight: 600;
             cursor: pointer;
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            min-height: 56px;
+            touch-action: manipulation;
         }
 
         .btn-primary:active {
@@ -223,15 +346,21 @@
 
         .btn-secondary {
             width: 100%;
-            padding: 12px;
+            padding: 16px;
             background: #3498db;
             color: white;
             border: none;
-            border-radius: 10px;
-            font-size: 14px;
+            border-radius: 12px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             margin-top: 10px;
+            min-height: 54px;
+            touch-action: manipulation;
+        }
+
+        .btn-secondary:active {
+            transform: scale(0.98);
         }
 
         .btn-danger {
@@ -478,6 +607,11 @@
 <body>
     <div class="notification-badge" id="notificationBadge" onclick="toggleNotifications()">0</div>
     
+    <div class="alert-banner" id="alertBanner">
+        <span id="alertBannerText"></span>
+        <button class="alert-banner-close" onclick="closeAlertBanner()">×</button>
+    </div>
+    
     <div class="notification-panel" id="notificationPanel">
         <div style="padding: 15px; border-bottom: 2px solid #eee; font-weight: 700; color: #2c3e50;">
             📢 Notifiche
@@ -561,16 +695,27 @@
                 </div>
 
                 <div class="card">
-                    <h2 style="color: #2c3e50; margin-bottom: 20px; font-size: 20px;">Riconsegna Attrezzatura</h2>
+                    <h2 style="color: #2c3e50; margin-bottom: 10px; font-size: 20px;">Riconsegna Attrezzatura</h2>
+                    <p style="color: #7f8c8d; font-size: 14px; margin-bottom: 20px;">
+                        Tocca l'attrezzatura che vuoi riconsegnare
+                    </p>
                     
-                    <div class="form-group">
-                        <label>Seleziona Attrezzatura *</label>
-                        <select id="selectAttrezzatura" required>
-                            <option value="">-- Seleziona --</option>
-                        </select>
+                    <div id="attrezzatureDisponibili">
+                        <div style="text-align: center; padding: 30px; color: #7f8c8d;">
+                            <div style="font-size: 50px; margin-bottom: 10px;">🔧</div>
+                            <p>Caricamento attrezzature in uso...</p>
+                        </div>
                     </div>
+                </div>
 
-                    <div id="riconsegnaForm" style="display: none;">
+                <div id="riconsegnaForm" style="display: none;">
+                    <div class="card">
+                        <h3 style="color: #2c3e50; margin-bottom: 15px; font-size: 18px;">
+                            Dettagli Riconsegna
+                        </h3>
+                        <div id="selectedAttrezzaturaInfo" style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                        </div>
+
                         <div class="form-group">
                             <label>Data di Riconsegna *</label>
                             <input type="date" id="dataRiconsegna" required>
@@ -591,6 +736,9 @@
                         </div>
 
                         <button class="btn-primary" onclick="completaRiconsegna()">✅ Completa Riconsegna</button>
+                        <button class="btn-secondary" onclick="annullaRiconsegna()" style="background: #95a5a6;">
+                            ← Cambia Attrezzatura
+                        </button>
                     </div>
                 </div>
             </div>
@@ -634,18 +782,51 @@
                 </div>
 
                 <div class="card">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;">📧 Configurazione Email</h3>
+                    <p style="font-size: 13px; color: #7f8c8d; margin-bottom: 15px;">
+                        Le email funzionano su <strong>tutti i dispositivi</strong> (Android, iOS, PC)
+                    </p>
+                    
+                    <div class="form-group">
+                        <label>Email Destinatario (Admin) *</label>
+                        <input type="email" id="emailAdmin" placeholder="admin@tuaazienda.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="emailAbilitato" checked style="width: auto; margin-right: 5px;">
+                            Abilita notifiche email
+                        </label>
+                    </div>
+
+                    <button class="btn-primary" onclick="salvaImpostazioniEmail()">💾 Salva Email</button>
+                    
+                    <div style="margin-top: 15px; padding: 12px; background: #e3f2fd; border-radius: 8px; font-size: 12px;">
+                        <strong>ℹ️ Come funziona:</strong><br>
+                        • <strong>Android</strong>: Notifiche Push + Email<br>
+                        • <strong>iOS</strong>: Solo Email (Safari non supporta push)<br>
+                        • <strong>Badge</strong>: Sempre visibili su tutti i dispositivi<br>
+                        • <strong>Gratis</strong>: Fino a 200 email/mese con EmailJS
+                    </div>
+
+                    <button class="btn-secondary" onclick="testEmail()" style="margin-top: 10px;">
+                        📨 Invia Email di Test
+                    </button>
+                </div>
+
+                <div class="card">
                     <h3 style="color: #2c3e50; margin-bottom: 15px;">⚠️ Alert Attrezzature Non Riconsegnate</h3>
                     <div id="alertList" class="alert-list"></div>
                 </div>
 
                 <div class="card">
                     <h3 style="color: #2c3e50; margin-bottom: 15px;">🔔 Gestione Notifiche Push</h3>
+                    <p style="font-size: 13px; color: #7f8c8d; margin-bottom: 10px;">
+                        <strong>Solo per Android/Chrome.</strong> Su iOS usa le email.
+                    </p>
                     <button class="btn-secondary" onclick="richiediPermessoNotifiche()">
                         Abilita Notifiche Push
                     </button>
-                    <p style="margin-top: 10px; font-size: 12px; color: #7f8c8d;">
-                        Riceverai notifiche per prestiti e riconsegne
-                    </p>
                 </div>
 
                 <div class="card">
@@ -670,6 +851,9 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-messaging-compat.js"></script>
+    
+    <!-- EmailJS per notifiche email -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
     <script>
         // Configurazione Firebase
@@ -701,8 +885,17 @@
         let notifications = [];
         let settings = {
             orarioInizio: '08:00',
-            orarioFine: '18:00'
+            orarioFine: '18:00',
+            emailAdmin: '',
+            emailAbilitato: true
         };
+
+        // Rileva se è iOS
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+        
+        // Inizializza EmailJS (servizio gratuito per email)
+        emailjs.init("YOUR_EMAILJS_PUBLIC_KEY"); // Da configurare dopo
 
         // Login
         function login() {
@@ -810,9 +1003,9 @@
         });
 
         // Carica select attrezzature in uso
+        // Carica attrezzature disponibili per riconsegna (con card)
         async function loadAttrezzaturaSelect() {
-            const select = document.getElementById('selectAttrezzatura');
-            select.innerHTML = '<option value="">-- Seleziona --</option>';
+            const container = document.getElementById('attrezzatureDisponibili');
             
             try {
                 const snapshot = await db.collection('attrezzature')
@@ -820,16 +1013,113 @@
                     .orderBy('dataPrelievo', 'desc')
                     .get();
                 
+                if (snapshot.empty) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 30px; color: #7f8c8d;">
+                            <div style="font-size: 50px; margin-bottom: 10px;">✅</div>
+                            <h3 style="margin-bottom: 8px;">Nessuna attrezzatura in uso</h3>
+                            <p style="font-size: 14px;">Tutte le attrezzature sono state riconsegnate!</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = '<div class="attrezzatura-grid">';
                 snapshot.forEach(doc => {
                     const item = doc.data();
-                    const option = document.createElement('option');
-                    option.value = doc.id;
-                    option.textContent = `${item.nomeAttrezzatura} - ${item.operatore}`;
-                    select.appendChild(option);
+                    const dataPrelievo = formatDate(item.dataPrelievo);
+                    const itemJson = JSON.stringify(item).replace(/"/g, '&quot;').replace(/'/g, '\\\'');
+                    html += `
+                        <div class="attrezzatura-card" onclick="selezionaAttrezzatura('${doc.id}', '${itemJson}')">
+                            <div class="attrezzatura-nome">${item.nomeAttrezzatura}</div>
+                            <div class="attrezzatura-info">
+                                <span>👤 ${item.operatore}</span>
+                                <span>•</span>
+                                <span>📅 ${dataPrelievo}</span>
+                            </div>
+                        </div>
+                    `;
                 });
+                html += '</div>';
+                
+                container.innerHTML = html;
+                
             } catch (error) {
                 console.error('Errore:', error);
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 30px; color: #e74c3c;">
+                        <div style="font-size: 50px; margin-bottom: 10px;">⚠️</div>
+                        <p>Errore nel caricamento</p>
+                        <button class="btn-secondary" onclick="loadAttrezzaturaSelect()" style="max-width: 200px; margin: 15px auto 0;">
+                            Riprova
+                        </button>
+                    </div>
+                `;
             }
+        }
+
+        // Seleziona attrezzatura da riconsegnare
+        function selezionaAttrezzatura(id, itemJson) {
+            const item = JSON.parse(itemJson.replace(/&quot;/g, '"'));
+            
+            // Rimuovi selezione precedente
+            document.querySelectorAll('.attrezzatura-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Aggiungi selezione alla card cliccata
+            event.currentTarget.classList.add('selected');
+            
+            // Salva ID selezionato
+            selectedItemId = id;
+            
+            // Mostra info attrezzatura selezionata
+            const infoDiv = document.getElementById('selectedAttrezzaturaInfo');
+            infoDiv.innerHTML = `
+                <div style="font-weight: 700; font-size: 17px; color: #2c3e50; margin-bottom: 8px;">
+                    ${item.nomeAttrezzatura}
+                </div>
+                <div style="font-size: 14px; color: #7f8c8d; display: grid; gap: 5px;">
+                    <div>👤 Operatore: <strong>${item.operatore}</strong></div>
+                    <div>📍 Locazione: <strong>${item.locazione}</strong></div>
+                    <div>📅 Prelevato il: <strong>${formatDate(item.dataPrelievo)}</strong></div>
+                    ${item.note ? `<div>📝 Note: ${item.note}</div>` : ''}
+                </div>
+            `;
+            
+            // Mostra form riconsegna
+            document.getElementById('riconsegnaForm').style.display = 'block';
+            
+            // Scroll al form
+            setTimeout(() => {
+                document.getElementById('riconsegnaForm').scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+            }, 100);
+        }
+
+        // Annulla selezione riconsegna
+        function annullaRiconsegna() {
+            // Nascondi form
+            document.getElementById('riconsegnaForm').style.display = 'none';
+            
+            // Rimuovi selezione
+            document.querySelectorAll('.attrezzatura-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Reset variabili
+            selectedItemId = null;
+            capturedPhoto = null;
+            
+            // Reset campi
+            document.getElementById('noteRiconsegna').value = '';
+            document.getElementById('photoPreviewRiconsegna').classList.remove('show');
+            document.getElementById('dataRiconsegna').valueAsDate = new Date();
+            
+            // Scroll in alto
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         // Completa riconsegna
@@ -877,15 +1167,14 @@
                 successMsg.classList.add('show');
                 setTimeout(() => successMsg.classList.remove('show'), 3000);
 
-                // Reset
-                document.getElementById('selectAttrezzatura').value = '';
-                document.getElementById('riconsegnaForm').style.display = 'none';
-                document.getElementById('noteRiconsegna').value = '';
-                document.getElementById('photoPreviewRiconsegna').classList.remove('show');
-                capturedPhoto = null;
-                selectedItemId = null;
-
+                // Reset completo
+                annullaRiconsegna();
+                
+                // Ricarica lista attrezzature
                 loadAttrezzaturaSelect();
+                
+                // Scroll in alto
+                window.scrollTo({ top: 0, behavior: 'smooth' });
 
             } catch (error) {
                 alert('Errore nel completare la riconsegna: ' + error.message);
@@ -1054,7 +1343,10 @@
             settings.orarioFine = document.getElementById('orarioFine').value;
             
             try {
-                await db.collection('settings').doc('orari').set(settings);
+                await db.collection('settings').doc('orari').set({
+                    orarioInizio: settings.orarioInizio,
+                    orarioFine: settings.orarioFine
+                });
                 alert('✓ Impostazioni salvate con successo!');
                 checkAlerts();
             } catch (error) {
@@ -1062,21 +1354,210 @@
             }
         }
 
+        // Salva impostazioni email
+        async function salvaImpostazioniEmail() {
+            const emailAdmin = document.getElementById('emailAdmin').value;
+            const emailAbilitato = document.getElementById('emailAbilitato').checked;
+            
+            if (emailAbilitato && !emailAdmin) {
+                alert('⚠️ Inserisci un indirizzo email!');
+                return;
+            }
+            
+            settings.emailAdmin = emailAdmin;
+            settings.emailAbilitato = emailAbilitato;
+            
+            try {
+                await db.collection('settings').doc('email').set({
+                    emailAdmin: emailAdmin,
+                    emailAbilitato: emailAbilitato
+                });
+                alert('✓ Impostazioni email salvate!');
+            } catch (error) {
+                alert('Errore: ' + error.message);
+            }
+        }
+
+        // Invia email di notifica
+        async function inviaEmail(tipo, data) {
+            if (!settings.emailAbilitato || !settings.emailAdmin) {
+                console.log('Email disabilitate o non configurate');
+                return;
+            }
+            
+            let oggetto, corpo;
+            
+            if (tipo === 'prestito') {
+                oggetto = '🔧 Nuova attrezzatura prelevata - Control System Wrench';
+                corpo = `
+NUOVA ATTREZZATURA PRELEVATA
+
+Attrezzatura: ${data.nomeAttrezzatura}
+Operatore: ${data.operatore}
+Locazione: ${data.locazione}
+Data prelievo: ${formatDate(data.dataPrelievo)}
+${data.note ? 'Note: ' + data.note : ''}
+
+--
+Control System Wrench
+Created by Germani Daniel
+                `.trim();
+            } else if (tipo === 'riconsegna') {
+                oggetto = '✅ Attrezzatura riconsegnata - Control System Wrench';
+                corpo = `
+ATTREZZATURA RICONSEGNATA
+
+Attrezzatura: ${data.nomeAttrezzatura}
+Operatore: ${data.operatore}
+Data riconsegna: ${formatDate(data.riconsegna.data)}
+${data.riconsegna.note ? 'Note riconsegna: ' + data.riconsegna.note : ''}
+${data.riconsegna.fotoUrl ? 'Foto: ' + data.riconsegna.fotoUrl : ''}
+
+--
+Control System Wrench
+Created by Germani Daniel
+                `.trim();
+            } else if (tipo === 'alert') {
+                oggetto = '⚠️ ALERT - Attrezzature non riconsegnate!';
+                corpo = `
+ALERT SCADENZE
+
+Le seguenti attrezzature NON sono state riconsegnate entro l'orario limite (${settings.orarioFine}):
+
+${data.map(item => `- ${item.nomeAttrezzatura} (${item.operatore})`).join('\n')}
+
+Controlla il pannello admin per maggiori dettagli.
+
+--
+Control System Wrench
+Created by Germani Daniel
+                `.trim();
+            }
+            
+            // Usa EmailJS per inviare (gratuito fino a 200 email/mese)
+            try {
+                await emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', {
+                    to_email: settings.emailAdmin,
+                    subject: oggetto,
+                    message: corpo,
+                    from_name: 'Control System Wrench'
+                });
+                console.log('✓ Email inviata con successo');
+            } catch (error) {
+                console.error('Errore invio email:', error);
+                // Non bloccare l'app se l'email fallisce
+            }
+        }
+
+        // Test email
+        async function testEmail() {
+            const emailAdmin = document.getElementById('emailAdmin').value;
+            if (!emailAdmin) {
+                alert('⚠️ Inserisci prima un indirizzo email!');
+                return;
+            }
+            
+            try {
+                await emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', {
+                    to_email: emailAdmin,
+                    subject: '📧 Email di Test - Control System Wrench',
+                    message: 'Questa è una email di test dal sistema Control System Wrench.\n\nSe ricevi questo messaggio, il sistema email funziona correttamente! ✓\n\n--\nCreated by Germani Daniel',
+                    from_name: 'Control System Wrench'
+                });
+                alert('✓ Email di test inviata! Controlla la tua casella.');
+            } catch (error) {
+                alert('❌ Errore: ' + error.message + '\n\nConfigura prima EmailJS (vedi guida)');
+            }
+        }
+
+        // Mostra alert banner in-app
+        function showAlertBanner(message, timeout = 0) {
+            const banner = document.getElementById('alertBanner');
+            const text = document.getElementById('alertBannerText');
+            text.textContent = message;
+            banner.classList.add('show');
+            
+            if (timeout > 0) {
+                setTimeout(() => {
+                    banner.classList.remove('show');
+                }, timeout);
+            }
+        }
+
+        // Chiudi alert banner
+        function closeAlertBanner() {
+            document.getElementById('alertBanner').classList.remove('show');
+        }
+
+        // Aggiorna badge con contatore attrezzature scadute
+        async function updateBadgeScaduti() {
+            try {
+                const snapshot = await db.collection('attrezzature')
+                    .where('stato', '==', 'in-uso')
+                    .get();
+                
+                let scadutiCount = 0;
+                snapshot.forEach(doc => {
+                    if (checkIfScaduto(doc.data())) {
+                        scadutiCount++;
+                    }
+                });
+                
+                if (scadutiCount > 0) {
+                    showAlertBanner(`⚠️ ${scadutiCount} attrezzatur${scadutiCount > 1 ? 'e' : 'a'} non riconsegnat${scadutiCount > 1 ? 'e' : 'a'} oltre orario!`);
+                    
+                    // Invia email alert se admin e non già inviata oggi
+                    if (isAdmin && settings.emailAbilitato) {
+                        const oggi = new Date().toDateString();
+                        const lastAlert = localStorage.getItem('lastEmailAlert');
+                        if (lastAlert !== oggi) {
+                            const items = [];
+                            snapshot.forEach(doc => {
+                                const item = doc.data();
+                                if (checkIfScaduto(item)) {
+                                    items.push(item);
+                                }
+                            });
+                            await inviaEmail('alert', items);
+                            localStorage.setItem('lastEmailAlert', oggi);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Errore badge scaduti:', error);
+            }
+        }
+
         // Carica impostazioni
         async function loadSettings() {
             try {
-                const doc = await db.collection('settings').doc('orari').get();
-                if (doc.exists) {
-                    settings = doc.data();
+                // Carica orari
+                const docOrari = await db.collection('settings').doc('orari').get();
+                if (docOrari.exists) {
+                    const data = docOrari.data();
+                    settings.orarioInizio = data.orarioInizio;
+                    settings.orarioFine = data.orarioFine;
                     document.getElementById('orarioInizio').value = settings.orarioInizio;
                     document.getElementById('orarioFine').value = settings.orarioFine;
+                }
+                
+                // Carica email
+                const docEmail = await db.collection('settings').doc('email').get();
+                if (docEmail.exists) {
+                    const data = docEmail.data();
+                    settings.emailAdmin = data.emailAdmin || '';
+                    settings.emailAbilitato = data.emailAbilitato !== false;
+                    if (isAdmin) {
+                        document.getElementById('emailAdmin').value = settings.emailAdmin;
+                        document.getElementById('emailAbilitato').checked = settings.emailAbilitato;
+                    }
                 }
             } catch (error) {
                 console.log('Impostazioni non trovate, uso default');
             }
         }
 
-        // Invia notifica
+        // Invia notifica (sistema misto)
         async function inviaNotifica(tipo, data) {
             const notifica = {
                 tipo: tipo,
@@ -1089,16 +1570,28 @@
             };
             
             try {
+                // 1. Salva notifica su database (per badge in-app)
                 await db.collection('notifiche').add(notifica);
                 aggiungiNotificaLocale(notifica);
                 
-                // Mostra notifica browser se permesso
-                if ('Notification' in window && Notification.permission === 'granted') {
+                // 2. Mostra banner in-app (TUTTI i dispositivi)
+                showAlertBanner(notifica.messaggio, 5000);
+                
+                // 3. Invia EMAIL (TUTTI i dispositivi - iOS incluso)
+                await inviaEmail(tipo, data);
+                
+                // 4. Notifica PUSH solo se NON iOS (Android/Desktop)
+                if (!isIOS && 'Notification' in window && Notification.permission === 'granted') {
                     new Notification(notifica.titolo, {
                         body: notifica.messaggio,
-                        icon: '🔧'
+                        icon: '🔧',
+                        badge: '🔧'
                     });
                 }
+                
+                // 5. Aggiorna badge scaduti
+                updateBadgeScaduti();
+                
             } catch (error) {
                 console.error('Errore invio notifica:', error);
             }
@@ -1193,8 +1686,17 @@
             if (isAdmin) {
                 setInterval(() => {
                     checkAlerts();
+                    updateBadgeScaduti();
                 }, 5 * 60 * 1000);
             }
+            
+            // Check badge scaduti ogni minuto per TUTTI
+            setInterval(() => {
+                updateBadgeScaduti();
+            }, 60 * 1000);
+            
+            // Check iniziale badge
+            updateBadgeScaduti();
         }
 
         // Reset database (solo admin)
