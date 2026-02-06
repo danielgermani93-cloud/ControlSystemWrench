@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Control System Wrench</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2c3e50">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .notification-badge {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            background: #e74c3c;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            box-shadow: 0 2px 8px rgba(231, 76, 60, 0.5);
+            cursor: pointer;
+            z-index: 101;
+            display: none;
+        }
+
+        .notification-badge.show {
+            display: flex;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            background: white;
+            border-radius: 15px;
+            padding: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px 8px;
+            border: none;
+            background: transparent;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #7f8c8d;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            min-width: fit-content;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+        }
+
+        .admin-only {
+            display: none;
+        }
+
+        .admin-mode .admin-only {
+            display: block;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .camera-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .camera-button:active {
+            transform: scale(0.98);
+        }
+
+        .photo-preview {
+            width: 100%;
+            max-height: 300px;
+            border-radius: 10px;
+            margin-top: 10px;
+            display: none;
+            object-fit: cover;
+        }
+
+        .photo-preview.show {
+            display: block;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            width: 100%;
+            padding: 12px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+        }
+
+        .item-card {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 10px;
+        }
+
+        .item-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2c3e50;
+            flex: 1;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+            margin-left: 10px;
+        }
+
+        .status-badge.in-uso {
+            background: #fee;
+            color: #c53030;
+        }
+
+        .status-badge.consegnato {
+            background: #efe;
+            color: #2f855a;
+        }
+
+        .status-badge.scaduto {
+            background: #ffeaa7;
+            color: #d63031;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .item-details {
+            display: grid;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .detail-row {
+            display: flex;
+            gap: 5px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #7f8c8d;
+        }
+
+        .empty-state-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: white;
+            font-size: 12px;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .filter-btn {
+            flex: 1;
+            padding: 10px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #7f8c8d;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: none;
+            font-weight: 600;
+        }
+
+        .success-message.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        .alert-message {
+            background: #fff3cd;
+            color: #856404;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .photo-thumbnail {
+            width: 100%;
+            max-height: 150px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        #cameraInput, #cameraInputRiconsegna {
+            display: none;
+        }
+
+        .login-container {
+            max-width: 400px;
+            margin: 50px auto;
+        }
+
+        .time-setting {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .time-setting input[type="time"] {
+            flex: 1;
+        }
+
+        .alert-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .alert-item {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .alert-item.critical {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+        }
+
+        .notification-panel {
+            position: fixed;
+            top: 60px;
+            right: 15px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            max-width: 300px;
+            max-height: 400px;
+            overflow-y: auto;
+            display: none;
+            z-index: 999;
+        }
+
+        .notification-panel.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .notification-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        .notification-time {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .riconsegna-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px dashed #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <div class="notification-badge" id="notificationBadge" onclick="toggleNotifications()">0</div>
+    
+    <div class="notification-panel" id="notificationPanel">
+        <div style="padding: 15px; border-bottom: 2px solid #eee; font-weight: 700; color: #2c3e50;">
+            📢 Notifiche
+        </div>
+        <div id="notificationList"></div>
+    </div>
+
+    <div class="header">
+        <h1>🔧 Control System Wrench</h1>
+        <p id="headerSubtitle">Gestione Attrezzature</p>
+    </div>
+
+    <div class="container" id="appContainer">
+        <!-- LOGIN SECTION -->
+        <div id="loginSection">
+            <div class="login-container">
+                <div class="card">
+                    <h2 style="color: #2c3e50; margin-bottom: 20px; text-align: center;">🔐 Accesso</h2>
+                    <div class="form-group">
+                        <label>Password Admin (opzionale)</label>
+                        <input type="password" id="adminPassword" placeholder="Lascia vuoto per accesso utente">
+                    </div>
+                    <button class="btn-primary" onclick="login()">Accedi</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN APP -->
+        <div id="mainApp" style="display: none;">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('nuovo')">📝 Nuovo</button>
+                <button class="tab" onclick="switchTab('riconsegna')">✅ Riconsegna</button>
+                <button class="tab" onclick="switchTab('lista')">📋 Lista</button>
+                <button class="tab admin-only" onclick="switchTab('admin')">⚙️ Admin</button>
+            </div>
+
+            <!-- TAB NUOVO PRESTITO -->
+            <div id="tab-nuovo" class="tab-content active">
+                <div class="success-message" id="successMessage">
+                    ✓ Attrezzatura registrata con successo!
+                </div>
+                
+                <div class="card">
+                    <h2 style="color: #2c3e50; margin-bottom: 20px; font-size: 20px;">Registra Nuovo Prestito</h2>
+                    
+                    <form id="nuovoForm">
+                        <div class="form-group">
+                            <label>Nome Attrezzatura *</label>
+                            <input type="text" id="nomeAttrezzatura" placeholder="Es: Chiave a forchetta 46 mm" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Locazione di Prelievo *</label>
+                            <input type="text" id="locazione" placeholder="Es: Magazzino A - Scaffale 3" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Operatore *</label>
+                            <input type="text" id="operatore" placeholder="Nome e Cognome" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Data di Prelievo *</label>
+                            <input type="date" id="dataPrelievo" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Note (opzionale)</label>
+                            <textarea id="note" rows="3" placeholder="Aggiungi eventuali note..."></textarea>
+                        </div>
+
+                        <button type="submit" class="btn-primary">📝 Registra Prestito</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- TAB RICONSEGNA -->
+            <div id="tab-riconsegna" class="tab-content">
+                <div class="success-message" id="successMessageRiconsegna">
+                    ✓ Riconsegna completata con successo!
+                </div>
+
+                <div class="card">
+                    <h2 style="color: #2c3e50; margin-bottom: 20px; font-size: 20px;">Riconsegna Attrezzatura</h2>
+                    
+                    <div class="form-group">
+                        <label>Seleziona Attrezzatura *</label>
+                        <select id="selectAttrezzatura" required>
+                            <option value="">-- Seleziona --</option>
+                        </select>
+                    </div>
+
+                    <div id="riconsegnaForm" style="display: none;">
+                        <div class="form-group">
+                            <label>Data di Riconsegna *</label>
+                            <input type="date" id="dataRiconsegna" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Foto della Riconsegna *</label>
+                            <input type="file" id="cameraInputRiconsegna" accept="image/*" capture="environment">
+                            <button type="button" class="camera-button" onclick="document.getElementById('cameraInputRiconsegna').click()">
+                                📷 Scatta Foto
+                            </button>
+                            <img id="photoPreviewRiconsegna" class="photo-preview" alt="Anteprima foto">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Note Riconsegna (opzionale)</label>
+                            <textarea id="noteRiconsegna" rows="3" placeholder="Condizioni dell'attrezzatura, eventuali danni..."></textarea>
+                        </div>
+
+                        <button class="btn-primary" onclick="completaRiconsegna()">✅ Completa Riconsegna</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB LISTA ATTREZZATURE -->
+            <div id="tab-lista" class="tab-content">
+                <div class="card" style="padding: 15px;">
+                    <div class="filter-group">
+                        <button class="filter-btn active" onclick="filterItems('tutti')">Tutti</button>
+                        <button class="filter-btn" onclick="filterItems('in-uso')">In Uso</button>
+                        <button class="filter-btn" onclick="filterItems('consegnati')">Consegnati</button>
+                        <button class="filter-btn" onclick="filterItems('scaduti')">⚠️ Scaduti</button>
+                    </div>
+                </div>
+
+                <div id="listaAttrezzature">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🔧</div>
+                        <h3>Nessuna attrezzatura registrata</h3>
+                        <p>Inizia registrando un nuovo prestito</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB ADMIN -->
+            <div id="tab-admin" class="tab-content admin-only">
+                <div class="card">
+                    <h2 style="color: #2c3e50; margin-bottom: 20px; font-size: 20px;">⚙️ Pannello Admin</h2>
+                    
+                    <div class="form-group">
+                        <label>Orario Inizio Lavori</label>
+                        <input type="time" id="orarioInizio" value="08:00">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Orario Fine Lavori</label>
+                        <input type="time" id="orarioFine" value="18:00">
+                    </div>
+
+                    <button class="btn-primary" onclick="salvaImpostazioniOrari()">💾 Salva Impostazioni</button>
+                </div>
+
+                <div class="card">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;">⚠️ Alert Attrezzature Non Riconsegnate</h3>
+                    <div id="alertList" class="alert-list"></div>
+                </div>
+
+                <div class="card">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;">🔔 Gestione Notifiche Push</h3>
+                    <button class="btn-secondary" onclick="richiediPermessoNotifiche()">
+                        Abilita Notifiche Push
+                    </button>
+                    <p style="margin-top: 10px; font-size: 12px; color: #7f8c8d;">
+                        Riceverai notifiche per prestiti e riconsegne
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;">🗑️ Gestione Dati</h3>
+                    <button class="btn-secondary btn-danger" onclick="resetDatabase()">
+                        Cancella Tutti i Dati
+                    </button>
+                    <p style="margin-top: 10px; font-size: 12px; color: #e74c3c;">
+                        ⚠️ Attenzione: questa azione è irreversibile!
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        Created by Germani Daniel
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-messaging-compat.js"></script>
+
+    <script>
+        // Configurazione Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBLhRl-xxxxxxxxxxxxxxxxxxx",
+            authDomain: "control-wrench.firebaseapp.com",
+            projectId: "control-wrench",
+            storageBucket: "control-wrench.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:xxxxxxxxxxxxx"
+        };
+
+        // Inizializza Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+        
+        let messaging = null;
+        try {
+            messaging = firebase.messaging();
+        } catch (e) {
+            console.log('Messaging non disponibile:', e);
+        }
+
+        let currentFilter = 'tutti';
+        let selectedItemId = null;
+        let capturedPhoto = null;
+        let isAdmin = false;
+        let notifications = [];
+        let settings = {
+            orarioInizio: '08:00',
+            orarioFine: '18:00'
+        };
+
+        // Login
+        function login() {
+            const password = document.getElementById('adminPassword').value;
+            if (password === 'admin123') {
+                isAdmin = true;
+                document.body.classList.add('admin-mode');
+                document.getElementById('headerSubtitle').textContent = 'Modalità Amministratore';
+            }
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            
+            loadSettings();
+            loadAttrezzature();
+            loadAttrezzaturaSelect();
+            checkAlerts();
+            listenToChanges();
+            
+            // Richiedi permesso notifiche se admin
+            if (isAdmin) {
+                setTimeout(richiediPermessoNotifiche, 1000);
+            }
+        }
+
+        // Imposta date odierne
+        document.getElementById('dataPrelievo').valueAsDate = new Date();
+        document.getElementById('dataRiconsegna').valueAsDate = new Date();
+
+        // Switch tra tabs
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById('tab-' + tabName).classList.add('active');
+            
+            if (tabName === 'lista') {
+                loadAttrezzature();
+            } else if (tabName === 'riconsegna') {
+                loadAttrezzaturaSelect();
+            } else if (tabName === 'admin' && isAdmin) {
+                checkAlerts();
+            }
+        }
+
+        // Gestione foto riconsegna
+        document.getElementById('cameraInputRiconsegna').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    capturedPhoto = event.target.result;
+                    const preview = document.getElementById('photoPreviewRiconsegna');
+                    preview.src = capturedPhoto;
+                    preview.classList.add('show');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Mostra form riconsegna quando si seleziona attrezzatura
+        document.getElementById('selectAttrezzatura').addEventListener('change', function() {
+            const form = document.getElementById('riconsegnaForm');
+            if (this.value) {
+                selectedItemId = this.value;
+                form.style.display = 'block';
+            } else {
+                form.style.display = 'none';
+            }
+        });
+
+        // Registra nuovo prestito
+        document.getElementById('nuovoForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const data = {
+                nomeAttrezzatura: document.getElementById('nomeAttrezzatura').value,
+                locazione: document.getElementById('locazione').value,
+                operatore: document.getElementById('operatore').value,
+                dataPrelievo: document.getElementById('dataPrelievo').value,
+                note: document.getElementById('note').value,
+                stato: 'in-uso',
+                dataRegistrazione: new Date().toISOString(),
+                riconsegna: null
+            };
+
+            try {
+                await db.collection('attrezzature').add(data);
+                
+                // Invia notifica
+                await inviaNotifica('prestito', data);
+                
+                // Mostra messaggio di successo
+                const successMsg = document.getElementById('successMessage');
+                successMsg.classList.add('show');
+                setTimeout(() => successMsg.classList.remove('show'), 3000);
+                
+                // Reset form
+                document.getElementById('nuovoForm').reset();
+                document.getElementById('dataPrelievo').valueAsDate = new Date();
+                
+            } catch (error) {
+                alert('Errore nel salvare i dati: ' + error.message);
+            }
+        });
+
+        // Carica select attrezzature in uso
+        async function loadAttrezzaturaSelect() {
+            const select = document.getElementById('selectAttrezzatura');
+            select.innerHTML = '<option value="">-- Seleziona --</option>';
+            
+            try {
+                const snapshot = await db.collection('attrezzature')
+                    .where('stato', '==', 'in-uso')
+                    .orderBy('dataPrelievo', 'desc')
+                    .get();
+                
+                snapshot.forEach(doc => {
+                    const item = doc.data();
+                    const option = document.createElement('option');
+                    option.value = doc.id;
+                    option.textContent = `${item.nomeAttrezzatura} - ${item.operatore}`;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Errore:', error);
+            }
+        }
+
+        // Completa riconsegna
+        async function completaRiconsegna() {
+            if (!capturedPhoto) {
+                alert('È necessario scattare una foto della riconsegna');
+                return;
+            }
+
+            if (!selectedItemId) {
+                alert('Seleziona un\'attrezzatura');
+                return;
+            }
+
+            const dataRiconsegna = document.getElementById('dataRiconsegna').value;
+            const noteRiconsegna = document.getElementById('noteRiconsegna').value;
+
+            try {
+                // Carica foto su Firebase Storage
+                const timestamp = Date.now();
+                const storageRef = storage.ref(`riconsegne/${selectedItemId}_${timestamp}.jpg`);
+                const uploadTask = await storageRef.putString(capturedPhoto, 'data_url');
+                const fotoUrl = await uploadTask.ref.getDownloadURL();
+
+                // Recupera dati attrezzatura
+                const doc = await db.collection('attrezzature').doc(selectedItemId).get();
+                const itemData = doc.data();
+
+                // Aggiorna documento
+                await db.collection('attrezzature').doc(selectedItemId).update({
+                    stato: 'consegnato',
+                    riconsegna: {
+                        data: dataRiconsegna,
+                        fotoUrl: fotoUrl,
+                        note: noteRiconsegna,
+                        dataCompletamento: new Date().toISOString()
+                    }
+                });
+
+                // Invia notifica
+                await inviaNotifica('riconsegna', { ...itemData, riconsegna: { data: dataRiconsegna } });
+
+                // Mostra successo
+                const successMsg = document.getElementById('successMessageRiconsegna');
+                successMsg.classList.add('show');
+                setTimeout(() => successMsg.classList.remove('show'), 3000);
+
+                // Reset
+                document.getElementById('selectAttrezzatura').value = '';
+                document.getElementById('riconsegnaForm').style.display = 'none';
+                document.getElementById('noteRiconsegna').value = '';
+                document.getElementById('photoPreviewRiconsegna').classList.remove('show');
+                capturedPhoto = null;
+                selectedItemId = null;
+
+                loadAttrezzaturaSelect();
+
+            } catch (error) {
+                alert('Errore nel completare la riconsegna: ' + error.message);
+            }
+        }
+
+        // Carica attrezzature
+        async function loadAttrezzature() {
+            const container = document.getElementById('listaAttrezzature');
+            
+            try {
+                const snapshot = await db.collection('attrezzature')
+                    .orderBy('dataRegistrazione', 'desc')
+                    .get();
+                
+                if (snapshot.empty) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🔧</div>
+                            <h3>Nessuna attrezzatura registrata</h3>
+                            <p>Inizia registrando un nuovo prestito</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = '';
+                snapshot.forEach(doc => {
+                    const item = doc.data();
+                    const isScaduto = checkIfScaduto(item);
+                    
+                    if (currentFilter === 'in-uso' && item.stato !== 'in-uso') return;
+                    if (currentFilter === 'consegnati' && item.stato !== 'consegnato') return;
+                    if (currentFilter === 'scaduti' && !isScaduto) return;
+                    
+                    let statusText = item.stato === 'in-uso' ? 'In Uso' : 'Consegnato';
+                    let statusClass = item.stato;
+                    
+                    if (isScaduto && item.stato === 'in-uso') {
+                        statusText = '⚠️ Scaduto';
+                        statusClass = 'scaduto';
+                    }
+                    
+                    html += `
+                        <div class="item-card">
+                            <div class="item-header">
+                                <div class="item-title">${item.nomeAttrezzatura}</div>
+                                <span class="status-badge ${statusClass}">${statusText}</span>
+                            </div>
+                            <div class="item-details">
+                                <div class="detail-row">
+                                    <span class="detail-label">📍 Locazione:</span>
+                                    <span>${item.locazione}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">👤 Operatore:</span>
+                                    <span>${item.operatore}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">📅 Prelievo:</span>
+                                    <span>${formatDate(item.dataPrelievo)}</span>
+                                </div>
+                                ${item.note ? `
+                                <div class="detail-row">
+                                    <span class="detail-label">📝 Note:</span>
+                                    <span>${item.note}</span>
+                                </div>
+                                ` : ''}
+                                ${item.riconsegna ? `
+                                <div class="detail-row">
+                                    <span class="detail-label">✅ Riconsegna:</span>
+                                    <span>${formatDate(item.riconsegna.data)}</span>
+                                </div>
+                                ${item.riconsegna.fotoUrl ? `
+                                    <img src="${item.riconsegna.fotoUrl}" class="photo-thumbnail" onclick="window.open('${item.riconsegna.fotoUrl}', '_blank')" alt="Foto riconsegna">
+                                ` : ''}
+                                ${item.riconsegna.note ? `
+                                <div class="detail-row">
+                                    <span class="detail-label">📝 Note riconsegna:</span>
+                                    <span>${item.riconsegna.note}</span>
+                                </div>
+                                ` : ''}
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = html || `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🔧</div>
+                        <h3>Nessuna attrezzatura trovata</h3>
+                        <p>Prova a cambiare filtro</p>
+                    </div>
+                `;
+                
+            } catch (error) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">⚠️</div>
+                        <h3>Errore nel caricamento</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Filtri
+        function filterItems(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            loadAttrezzature();
+        }
+
+        // Verifica se attrezzatura è scaduta
+        function checkIfScaduto(item) {
+            if (item.stato !== 'in-uso') return false;
+            
+            const oggi = new Date();
+            const orarioFine = settings.orarioFine || '18:00';
+            const [ore, minuti] = orarioFine.split(':');
+            
+            const limiteOggi = new Date(oggi);
+            limiteOggi.setHours(parseInt(ore), parseInt(minuti), 0, 0);
+            
+            return oggi > limiteOggi;
+        }
+
+        // Check alerts admin
+        async function checkAlerts() {
+            if (!isAdmin) return;
+            
+            const alertList = document.getElementById('alertList');
+            let html = '';
+            
+            try {
+                const snapshot = await db.collection('attrezzature')
+                    .where('stato', '==', 'in-uso')
+                    .get();
+                
+                snapshot.forEach(doc => {
+                    const item = doc.data();
+                    if (checkIfScaduto(item)) {
+                        const ore = Math.floor((new Date() - new Date(item.dataPrelievo)) / (1000 * 60 * 60));
+                        html += `
+                            <div class="alert-item critical">
+                                <strong>⚠️ ${item.nomeAttrezzatura}</strong><br>
+                                <small>Operatore: ${item.operatore}</small><br>
+                                <small>Prelevato: ${formatDate(item.dataPrelievo)}</small><br>
+                                <small style="color: #dc3545;">Non riconsegnato da ${ore} ore</small>
+                            </div>
+                        `;
+                    }
+                });
+                
+                alertList.innerHTML = html || '<p style="text-align: center; color: #2f855a;">✓ Nessun alert al momento</p>';
+            } catch (error) {
+                alertList.innerHTML = '<p style="color: #e74c3c;">Errore nel caricamento alert</p>';
+            }
+        }
+
+        // Salva impostazioni orari
+        async function salvaImpostazioniOrari() {
+            settings.orarioInizio = document.getElementById('orarioInizio').value;
+            settings.orarioFine = document.getElementById('orarioFine').value;
+            
+            try {
+                await db.collection('settings').doc('orari').set(settings);
+                alert('✓ Impostazioni salvate con successo!');
+                checkAlerts();
+            } catch (error) {
+                alert('Errore nel salvare le impostazioni: ' + error.message);
+            }
+        }
+
+        // Carica impostazioni
+        async function loadSettings() {
+            try {
+                const doc = await db.collection('settings').doc('orari').get();
+                if (doc.exists) {
+                    settings = doc.data();
+                    document.getElementById('orarioInizio').value = settings.orarioInizio;
+                    document.getElementById('orarioFine').value = settings.orarioFine;
+                }
+            } catch (error) {
+                console.log('Impostazioni non trovate, uso default');
+            }
+        }
+
+        // Invia notifica
+        async function inviaNotifica(tipo, data) {
+            const notifica = {
+                tipo: tipo,
+                titolo: tipo === 'prestito' ? '🔧 Nuovo Prestito' : '✅ Riconsegna Completata',
+                messaggio: tipo === 'prestito' 
+                    ? `${data.operatore} ha prelevato ${data.nomeAttrezzatura}`
+                    : `${data.operatore} ha riconsegnato ${data.nomeAttrezzatura}`,
+                timestamp: new Date().toISOString(),
+                data: data
+            };
+            
+            try {
+                await db.collection('notifiche').add(notifica);
+                aggiungiNotificaLocale(notifica);
+                
+                // Mostra notifica browser se permesso
+                if ('Notification' in window && Notification.permission === 'granted') {
+                    new Notification(notifica.titolo, {
+                        body: notifica.messaggio,
+                        icon: '🔧'
+                    });
+                }
+            } catch (error) {
+                console.error('Errore invio notifica:', error);
+            }
+        }
+
+        // Aggiungi notifica locale
+        function aggiungiNotificaLocale(notifica) {
+            notifications.unshift(notifica);
+            updateNotificationBadge();
+            updateNotificationPanel();
+        }
+
+        // Aggiorna badge notifiche
+        function updateNotificationBadge() {
+            const badge = document.getElementById('notificationBadge');
+            if (notifications.length > 0) {
+                badge.textContent = notifications.length;
+                badge.classList.add('show');
+            } else {
+                badge.classList.remove('show');
+            }
+        }
+
+        // Aggiorna pannello notifiche
+        function updateNotificationPanel() {
+            const list = document.getElementById('notificationList');
+            let html = '';
+            
+            if (notifications.length === 0) {
+                html = '<div style="padding: 20px; text-align: center; color: #999;">Nessuna notifica</div>';
+            } else {
+                notifications.forEach(n => {
+                    html += `
+                        <div class="notification-item">
+                            <strong>${n.titolo}</strong>
+                            <div style="margin: 5px 0;">${n.messaggio}</div>
+                            <div class="notification-time">${formatDateTime(n.timestamp)}</div>
+                        </div>
+                    `;
+                });
+            }
+            
+            list.innerHTML = html;
+        }
+
+        // Toggle pannello notifiche
+        function toggleNotifications() {
+            const panel = document.getElementById('notificationPanel');
+            panel.classList.toggle('show');
+        }
+
+        // Chiudi pannello cliccando fuori
+        document.addEventListener('click', function(e) {
+            const panel = document.getElementById('notificationPanel');
+            const badge = document.getElementById('notificationBadge');
+            if (!panel.contains(e.target) && e.target !== badge) {
+                panel.classList.remove('show');
+            }
+        });
+
+        // Richiedi permesso notifiche
+        async function richiediPermessoNotifiche() {
+            if (!('Notification' in window)) {
+                alert('Il tuo browser non supporta le notifiche');
+                return;
+            }
+            
+            const permission = await Notification.requestPermission();
+            if (permission === 'granted') {
+                alert('✓ Notifiche abilitate!');
+            } else {
+                alert('Notifiche non abilitate');
+            }
+        }
+
+        // Ascolta cambiamenti in tempo reale
+        function listenToChanges() {
+            // Ascolta nuove notifiche
+            db.collection('notifiche')
+                .orderBy('timestamp', 'desc')
+                .limit(20)
+                .onSnapshot(snapshot => {
+                    snapshot.docChanges().forEach(change => {
+                        if (change.type === 'added') {
+                            const notifica = change.doc.data();
+                            aggiungiNotificaLocale(notifica);
+                        }
+                    });
+                });
+            
+            // Check alert ogni 5 minuti se admin
+            if (isAdmin) {
+                setInterval(() => {
+                    checkAlerts();
+                }, 5 * 60 * 1000);
+            }
+        }
+
+        // Reset database (solo admin)
+        async function resetDatabase() {
+            if (!confirm('⚠️ ATTENZIONE! Questa operazione cancellerà TUTTI i dati. Sei sicuro?')) {
+                return;
+            }
+            
+            if (!confirm('Confermi nuovamente? Questa azione è IRREVERSIBILE!')) {
+                return;
+            }
+            
+            try {
+                // Cancella attrezzature
+                const snapshot = await db.collection('attrezzature').get();
+                const batch = db.batch();
+                snapshot.forEach(doc => batch.delete(doc.ref));
+                await batch.commit();
+                
+                // Cancella notifiche
+                const notifSnapshot = await db.collection('notifiche').get();
+                const notifBatch = db.batch();
+                notifSnapshot.forEach(doc => notifBatch.delete(doc.ref));
+                await notifBatch.commit();
+                
+                alert('✓ Database resettato con successo');
+                location.reload();
+            } catch (error) {
+                alert('Errore: ' + error.message);
+            }
+        }
+
+        // Formatta data
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('it-IT', { 
+                day: '2-digit', 
+                month: '2-digit', 
+                year: 'numeric' 
+            });
+        }
+
+        // Formatta data e ora
+        function formatDateTime(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleString('it-IT', { 
+                day: '2-digit', 
+                month: '2-digit', 
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Check alerts periodicamente
+        setInterval(() => {
+            if (isAdmin && document.getElementById('tab-admin').classList.contains('active')) {
+                checkAlerts();
+            }
+        }, 60000); // Ogni minuto
+    </script>
+</body>
+</html>
